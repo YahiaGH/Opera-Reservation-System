@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'username', 'email', 'password', 'fname', 'lname', 'gender', 'city', 'address', 'Bdate',
     ];
 
     /**
@@ -36,6 +36,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function ticket()
+    {
+        return $this->belongsToMany('App\event');
+    }
 
     public $primaryKey = 'id';
 

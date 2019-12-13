@@ -20,8 +20,10 @@ Route::get('/', function () {
 
 //Route::get('/','PagesController@index');
 
-Route::resource('customers', 'customerController');
-Route::resource('events', 'EventController');
+Route::resource('event', 'EventController');
+Route::resource('hall', 'HullController');
+Route::resource('ticket', 'TicketController');
+
 
 Auth::routes();
 

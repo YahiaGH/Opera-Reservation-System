@@ -49,9 +49,16 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'username' => ['required', 'string', 'max:191', 'unique:users,username'],
+            'email' => ['required', 'string', 'email', 'max:191', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'fname' => ['required', 'string', 'max:50'],
+            'lname' => ['required', 'string', 'max:50'],
+            'gender' => ['required', 'string', 'max:1'],
+            'city' => ['required', 'string', 'max:100'],
+            'address' => ['string', 'max:100'],
+            'Bdate' => ['required', 'Date', 'before: -13 years'],
+
         ]);
     }
 
@@ -63,10 +70,18 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+
         return User::create([
-            'name' => $data['name'],
+            'username' => $data['username'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'fname' => $data['fname'],
+            'lname' => $data['lname'],
+            'city' => $data['city'],
+            'gender' => $data['gender'],
+            'address' => $data['address'],
+            'Bdate' => $data['Bdate'],
+            'privilage' => 'customer', // **** alawys. 
         ]);
     }
 }
