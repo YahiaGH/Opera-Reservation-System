@@ -19,7 +19,7 @@ Route::get('/', function () {
 
 
 //Route::get('/','PagesController@index');
-
+Route::get('event/getAvailableHalls', 'EventController@getAvailableHalls');
 Route::resource('event', 'EventController');
 Route::resource('hall', 'HullController');
 Route::resource('ticket', 'TicketController');

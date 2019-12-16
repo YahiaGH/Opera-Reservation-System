@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Carbon\Carbon;
 use App\event;
-use App\hall;
+use App\Http\Controllers\Storage;
 
 class EventController extends Controller
 {
@@ -25,7 +25,9 @@ class EventController extends Controller
         // ** view all events to all users privliegs.
         //** after current date check needed. */
         $events = event::all()->filter(function ($event) {
-            return $event->event_Date > Carbon::now();
+            if ($event->event_Date > Carbon::now()) {
+                return $event;
+            }
         });
         return $events;
     }
@@ -38,10 +40,48 @@ class EventController extends Controller
     public function create()
     {
         //** redirect to page of creation of an event if you are auth: as manager*/
-        if (Gate::allows('isAdmin')) {
-            $halls = hall::all();
-            return view('pages.eventCreate')->with('hall', $halls); // ??? Dummpy Page.
+
+        //* create Ajax Request whenever the event date changes to get the avalible halls
+        if (Gate::allows('isManager')) {
+            return view('pages.eventCreate'); // ??? Dummpy Page.
         }
+        return abort(404);
+    }
+
+    /**
+     * Returns Available Halls for AJAX Listen.
+     *
+     * @return \Illuminate\Http\Response
+     */
+
+    public function getAvailableHalls()
+    {
+        if (Gate::allows('isManager')) {
+            $eventDate = Carbon::parse('2019-12-30 14:30:00')->addHours(2); // * got from create event form.
+            $eventDuration = Carbon::parse('05:00:00');
+            $eventDateEnd = $eventDate->copy();
+
+            $eventDateEnd->addHours($eventDuration->hour);
+            $eventDateEnd->addMinutes($eventDuration->minute);
+            $eventDateEnd->addSeconds($eventDuration->second);
+
+            $halls = (event::all($columns = ['event_Date', 'event_duration', 'hall_id'])->filter(function ($event) use ($eventDate, $eventDateEnd) {
+
+                $endDate = Carbon::createFromDate($event->event_Date)->addHours(2);
+                $startDate = $endDate->copy();
+                $duration  = Carbon::createFromTimeString($event->event_duration, 'Europe/London');
+                $endDate->addHours($duration->hour);
+                $endDate->addMinutes($duration->minute);
+                $endDate->addSeconds($duration->second);
+
+
+                if (!$eventDate->between($startDate, $endDate) and !$eventDateEnd->between($startDate, $endDate)) {
+                    return $event;
+                }
+            }));
+            return response()->json($halls->unique('hall_id'));
+        }
+
         return abort(404);
     }
 
@@ -100,7 +140,8 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        //
+        $event = event::find($id);
+        return view('pages.showEvent')->with('event', $event); //* Dummy page.
     }
 
     /**
@@ -111,7 +152,18 @@ class EventController extends Controller
      */
     public function edit($id)
     {
-        //
+        if (Gate::allows('isManager')) {
+
+            $event = event::find($id);
+
+            if (!isset($event)) {
+                return redirect('/events')->with('error', 'No Event Found'); //** Dummy Erorr Content Page */
+            }
+
+            return view('pages.editEvent')->with('event', $event); //** Dummy Page */
+        }
+
+        return abort(404);
     }
 
     /**
@@ -123,7 +175,7 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        
     }
 
     /**
@@ -134,6 +186,21 @@ class EventController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (Gate::allows('isManager')) {
+            $event = event::find($id);
+
+            if (!isset($event)) {
+                return redirect('/event')->with('error', 'No Event Found'); //** Dummy Erorr Content Page */
+            }
+
+            if ($event->cover_image != 'noimage.jpg') {
+                Storage::delete('public/cover_images/' . $event->cover_image);
+            }
+
+            $event->delete();
+
+            return redirect('/events')->with('success', 'Event Removed'); //** Dummy Erorr Content Page */
+        }
+        return abort(404);
     }
 }
