@@ -15,6 +15,7 @@ return [
 
     'paths' => [
         resource_path('views'),
+        realpath(base_path('/')),
     ],
 
     /*
@@ -22,7 +23,7 @@ return [
     | Compiled View Path
     |--------------------------------------------------------------------------
     |
-    | This option determines where all the compiled Blade templates will be
+    | Thi s option determines where all the compiled Blade templates will be
     | stored for your application. Typically, this is within the storage
     | directory. However, as usual, you are free to change this value.
     |

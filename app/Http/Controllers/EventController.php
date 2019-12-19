@@ -96,7 +96,7 @@ class EventController extends Controller
     {
         $id = 2;
         $tickets = ticket::all($columns = ['Seat_numbers'])->filter(function ($ticket) use ($id) {
-            if($ticket->Event_id != "2"){
+            if ($ticket->Event_id != "2") {
                 return $ticket;
             }
         });
@@ -179,7 +179,7 @@ class EventController extends Controller
                 return redirect('/events')->with('error', 'No Event Found'); //** Dummy Erorr Content Page */
             }
 
-            return view('pages.editEvent')->with('event', $event); //** Dummy Page */
+            return view('pages.contact')->with('event', $event); //** Dummy Page */
         }
 
         return abort(404);
@@ -198,7 +198,6 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-
     }
 
     /**
