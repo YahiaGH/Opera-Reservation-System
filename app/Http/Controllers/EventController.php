@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use Carbon\Carbon;
 use App\event;
 use App\Http\Controllers\Storage;
+use App\ticket;
 
 class EventController extends Controller
 {
@@ -83,6 +84,24 @@ class EventController extends Controller
         }
 
         return abort(404);
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showVacantSeats()
+    {
+        $id = 2;
+        $tickets = ticket::all($columns = ['Seat_numbers'])->filter(function ($ticket) use ($id) {
+            if($ticket->Event_id != "2"){
+                return $ticket;
+            }
+        });
+
+        return $tickets;
     }
 
     /**
@@ -166,6 +185,10 @@ class EventController extends Controller
         return abort(404);
     }
 
+
+
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -175,7 +198,7 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
     }
 
     /**

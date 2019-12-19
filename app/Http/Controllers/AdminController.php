@@ -1,12 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\ticket;
-use App\Event;
+use App\User;
 use Illuminate\Http\Request;
 
-class TicketController extends Controller
+class AdminController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +13,28 @@ class TicketController extends Controller
      */
     public function index()
     {
-        return ticket::all();
+        $users = User::all()->filter(function ($user) {
+            if ($user->privilage == 'pending') {
+                return $user;
+            }
+        });;
+        return $users;
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showAll()
+    {
+        $users = User::all()->filter(function ($user) {
+            if ($user->privilage != 'pending') {
+                return $user;
+            }
+        });;
+        return $users;
+        //return view('Admin.showAll')->with('Admin',$user);
     }
 
     /**
@@ -36,14 +55,7 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
-        $event = new event();
-        $event->customer_id = $request->input('customer_id');
-        $event->Event_id = $request->input('Event_id');
-        $event->Seat_numbers = $request->input('Seat_numbers');
-
-        $event->save();
-        return redirect('/ticket')->with('success', 'Ticket Created Successfully');
-
+        //
     }
 
     /**
@@ -54,8 +66,9 @@ class TicketController extends Controller
      */
     public function show($id)
     {
-        $ticket =ticket::find($id);
-        return $ticket;
+        $user = User::find($id);
+        //return view('Admin.show')->with('user',$user);
+        return $user;
     }
 
     /**
@@ -66,7 +79,9 @@ class TicketController extends Controller
      */
     public function edit($id)
     {
-
+        $user = User::find($id);
+        return $user;
+        //return view('Admin.edit')->with('user',$user);
     }
 
     /**
@@ -78,6 +93,13 @@ class TicketController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->validate($request, [
+            'privilage' => ['required']
+        ]);
+        $user =User::find($id);
+        $user->privilage = $request->input('privilage');
+        $user->save();
+        return redirect('/Admin.index')->with('success', 'User Edited Successfully');
 
     }
 
@@ -89,15 +111,9 @@ class TicketController extends Controller
      */
     public function destroy($id)
     {
-        $ticket =ticket::find($id);
-        $event =event::find($ticket->Event_id);
-        $TimeNow = new Carbon();
+        $user =User::find($id);
+        $user->delete();
+        return redirect('/Admin.index')->with('success', 'User Removed Successfully');
 
-        if($event->event_Date->add(CarbonInterval::days(3)) < $TimeNow ){
-            $ticket->delete();
-            return redirect('/ticket.index')->with('success', 'Ticket Removed Successfully');
-        }
-        return abort(404);
     }
-
 }
