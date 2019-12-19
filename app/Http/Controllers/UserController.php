@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\User;
 use Illuminate\Http\Request;
-use App\Customer;
 
-class customerController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +13,7 @@ class customerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::all();
-        return view('customers.index')->with('customers',$customers);
+        return User::all();
     }
 
     /**
@@ -47,7 +45,8 @@ class customerController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::find($id);
+        return view('user.show')->with('user',$user);
     }
 
     /**
@@ -58,7 +57,8 @@ class customerController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::find($id);
+        return view('user.edit')->with('user',$user);
     }
 
     /**
@@ -70,7 +70,23 @@ class customerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user =User::find($id);
+        if($request->input('fname') != NULL)
+            $user->fname = $request->input('fname');
+        if($request->input('lname') != NULL)
+            $user->lname = $request->input('lname');
+        if($request->input('gender') != NULL)
+            $user->gender = $request->input('gender');
+        if($request->input('city') != NULL)
+            $user->city = $request->input('city');
+        if($request->input('address') != NULL)
+            $user->address = $request->input('address');
+        if($request->input('Bdate') != NULL)
+            $user->Bdate = $request->input('Bdate');
+
+        $user->save();
+        return redirect('/user')->with('success', 'User Edited Successfully');
+
     }
 
     /**
