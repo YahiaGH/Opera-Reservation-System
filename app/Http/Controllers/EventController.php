@@ -89,14 +89,14 @@ class EventController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function showVacantSeats()
+    public function showVacantSeats($id)
     {
-        $id = 2;
-        $tickets = ticket::all($columns = ['Seat_numbers'])->filter(function ($ticket) use ($id) {
-            if ($ticket->Event_id != "2") {
+
+        $tickets = ticket::all($columns = ['Event_id','Seat_numbers'])->filter(function ($ticket) use ($id) {
+            if($ticket->Event_id == 2){
                 return $ticket;
             }
         });
