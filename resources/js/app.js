@@ -29,4 +29,27 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 
 const app = new Vue({
     el: '#app',
+    created() {
+        Echo.private('Reservation')
+            .listen('ReservedTickets', (ticket) => {
+                var seats = (ticket.Ticket).split(' ');
+                if (seats[0] == window.eventID) {
+                    for (var i = 1; i < seats.length; i++) {
+                        var Query = $('#app .content .main .wrapper #seat-map .seatCharts-row #' + seats[i]);
+                        $('#app .content .main .wrapper .booking-details #selected-seats #cart-item-' + seats[i]).remove();
+                        if (Query.hasClass('selected')) {
+                            Query.removeClass("selected");
+                            var chairsCount = parseInt($('#app .content .main .wrapper .booking-details h3 #counter').text());
+                            var price = parseInt($('#app .content .main .wrapper .booking-details b #total').text())
+                            $('#app .content .main .wrapper .booking-details h3 #counter').text(chairsCount - 1);
+                            $('#app .content .main .wrapper .booking-details b #total').text(price - 100);
+                        }
+
+                        Query.removeClass("available");
+                        Query.addClass("unavailable");
+                        Query.css("pointer-events", "none");
+                    }
+                }
+            });
+    }
 });

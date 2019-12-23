@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Opera Ticket Reservation</title>
+<!-- //for-mobile-apps -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+<link href='{{asset('css/google_fonts.css')}}' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" type="text/css" href="{{asset('css/jquery.seat-charts.css')}}">
+<link href="{{asset('css/style.css')}}" rel="stylesheet" type="text/css" media="all" />
+<script src="{{asset('js/jquery-1.11.0.min.js')}}"></script>
+<script src="{{asset('js/jquery.seat-charts.js')}}"></script>
+
+<link rel="stylesheet" type="text/css" href="{{asset('css/app.css')}}">
+<script src="{{asset('js/jquery.nicescroll.js')}}"></script>
+<script src="{{asset('js/scripts.js')}}"></script>
+<script src="{{asset('js/app.js')}}"></script>
+<script>
+				var firstSeatLabel = 1;
+			
+				var test = []
+				var rows=5;
+				var cols=7;
+				var i = 0 ;
+				var j = 0 ;
+				var dash = 40-cols;
+				for( i = 0 ; i < rows; i++)
+				{
+					var s = '';
+					for (j=0;j<40;j++)
+					{
+						if (cols<40)
+						{
+							if(cols%2==0)
+							{
+								if(j<dash/2)
+								{
+									s+='_'
+								}
+								else if (j>dash/2 && j<dash/2+cols+1)
+								{
+									s+='f'
+								}
+								else {
+									s+='_'
+								}
+							}else{
+								if(j<dash/2)
+								{
+									s+='_'
+								}
+								else if (j>dash/2 && j<dash/2+cols)
+								{
+									s+='f'
+								}
+								else {
+									s+='_'
+								}
+							}
+							
+						}
+						else
+						{
+							s += 'f';
+						}
+						
+					}
+					test.push(s);
+					
+				}
+						
+				$(document).ready(function() {
+					var $cart = $('#selected-seats'),
+						$counter = $('#counter'),
+						$total = $('#total'),
+						sc = $('#seat-map').seatCharts({
+						map: test,
+						seats: {
+							f: {
+								price   : 100,
+								classes : 'first-class', //your custom CSS class
+								category: 'First Class'
+							},
+							e: {
+								price   : 40,
+								classes : 'economy-class', //your custom CSS class
+								category: 'Economy Class'
+							}					
+						
+						},
+						naming : {
+							top : false,
+							getLabel : function (character, row, column) {
+								return firstSeatLabel++;
+							},
+						},
+						legend : {
+							node : $('#legend'),
+							items : [
+								[ 'f', 'available',   'First Class' ],
+								[ 'e', 'available',   'Economy Class'],
+								[ 'f', 'unavailable', 'Already Booked']
+							]					
+						},
+						click: function () {
+							if (this.status() == 'available') {
+								//let's create a new <li> which we'll add to the cart items
+								$('<li>'+this.data().category+' : Seat no '+this.settings.label+': <b>$'+this.data().price+'</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>')
+									.attr('id', 'cart-item-'+this.settings.id)
+									.data('seatId', this.settings.id)
+									.appendTo($cart);
+								
+								/*
+								 * Lets update the counter and total
+								 *
+								 * .find function will not find the current seat, because it will change its stauts only after return
+								 * 'selected'. This is why we have to add 1 to the length and the current seat price to the total.
+								 */
+								$counter.text(sc.find('selected').length+1);
+								$total.text(recalculateTotal(sc)+this.data().price);
+								
+								return 'selected';
+							} else if (this.status() == 'selected') {
+								//update the counter
+								$counter.text(sc.find('selected').length-1);
+								//and total
+								$total.text(recalculateTotal(sc)-this.data().price);
+							
+								//remove the item from our cart
+								$('#cart-item-'+this.settings.id).remove();
+							
+								//seat has been vacated
+								return 'available';
+							} else if (this.status() == 'unavailable') {
+								//seat has been already booked
+								return 'unavailable';
+							} else {
+								return this.style();
+							}
+						}
+					});
+
+					//this will handle "[cancel]" link clicks
+					$('#selected-seats').on('click', '.cancel-cart-item', function () {
+						//let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
+						sc.get($(this).parents('li:first').data('seatId')).click();
+					});
+
+					//let's pretend some seats have already been booked
+					sc.get(['1_2', '4_1', '7_1', '7_2']).status('unavailable');
+			});
+
+			function recalculateTotal(sc) {
+				var total = 0;
+			
+				//basically find every selected seat and sum its price
+				sc.find('selected').each(function () {
+					total += this.data().price;
+				});
+				
+				return total;
+			}
+		</script>
+</head>
+<body>
+<div id="app">
+	<div class="content">
+	<h1>Opera Ticket Reservation</h1>
+	<div class="main">
+		<h2>Book Your Seat Now?</h2>
+		<div class="wrapper">
+			<div id="seat-map">
+				<div class="front-indicator"><h3>Opera</h3></div>
+			</div>
+			<div class="booking-details">
+						<div id="legend"></div>
+						<h3> Selected Seats (<span id="counter">0</span>):</h3>
+						<ul id="selected-seats" class="scrollbar scrollbar1"></ul>
+						
+						Total: <b>$<span id="total">0</span></b>
+						<form>
+							<br>
+						   <div class="form-group">
+   							 <label for="exampleFormControlInput1">Card Card Number</label>
+							<input class="form-control" type="text" title="Enter a Valid Credit Card Number" pattern= "^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$" placeholder="ex: 1234 5678 9123 4567">	
+					       </div>
+							  
+							<div class="form-group">
+   							 <label for="exampleFormControlInput1">Credit Card PIN</label>
+							<input class="form-control" type="text" title="Enter a Valid Credit Card PIN Number" pattern= "^[0-9]{3,4}$" placeholder="ex: 123 or 1234">	
+					       </div>
+
+						</form>
+					
+						<button class="checkout-button">Check Out</button>
+						
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+<p class="copy_rights">Copy Rights&copy; 2019 All Rights Reserved By Opera.</p>
+
+</div>
+
+</div>
+</body>
+</html>

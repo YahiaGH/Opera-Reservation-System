@@ -12,10 +12,10 @@
     <title>OPERA</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="img/core-img/favicon.ico">
+    <link rel="icon" href="{{asset('img/core-img/favicon.ico')}}">
 
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ asset('img/bg-img/breadcum') }}">
 
 </head>
 
@@ -40,7 +40,7 @@
                     <nav class="classy-navbar justify-content-between" id="oneMusicNav">
 
                         <!-- Nav brand -->
-                        <a href="index.html" class="nav-brand"><img src="img/core-img/logo.png" alt=""></a>
+                    <a href="{{url('/')}}" class="nav-brand"><img src="{{asset('img/core-img/logo.png')}}" alt=""></a>
 
                         <!-- Navbar Toggler -->
                         <div class="classy-navbar-toggler">
@@ -58,61 +58,54 @@
                             <!-- Nav Start -->
                             <div class="classynav">
                                 <ul>
-                                    <li><a href="index.html">Home</a></li>
-                                    <li><a href="event.html">Events</a></li>
-									<li><a href="contact.html">Account Settings</a></li>
-									
+                                    <li><a href={{ url('/') }}>Home</a></li>
+                                    <li><a href="{{ url('event') }}">Events</a></li>
+
+                                    @auth
+                                        <li><a href="{{ url('user/' . auth::user()->id . '/edit') }}">Account Settings</a></li>
+                                        @if(Gate::allows('isCustomer'))
+                                        <li><a href="{{ route('ticket.index') }}">Reserved Tickets</a></li>
+                                        @endif
+                                    @endauth
+                                    
+                                    
+                                    @auth
+                                    @if(Gate::allows('isManager'))
                                     <li><a href="#">Manager</a>
                                         <ul class="dropdown">
-                                         	<li><a href="event.html">Add Events</a></li>
-											<li><a href="event.html">Add Halls</a></li>
-											<li><a href="event.html">Cancel Events</a></li>
-											<li><a href="event.html">Cancel Halls</a></li>
-											
-                                            <li><a href="#">Dropdown</a>
-                                                <ul class="dropdown">
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a>
-                                                        <ul class="dropdown">
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                </ul>
-                                            </li>
+                                         	<li><a href="{{ route('event.create') }}">Create Events</a></li>
+                                            <li><a href="{{ route('hall.create') }}">Add Halls</a></li>
+                                            <li><a href="{{ route('hall.index') }}">View All Halls</a></li>
                                         </ul>
                                     </li>
-									<li><a href="#">Admin</a>
+                                    @endif
+                                    @endauth
+                                    
+
+                                    @auth
+                                    @if(Gate::allows('isAdmin'))
+                                    <li><a href="#">Admin</a>
                                         <ul class="dropdown">
-                                         	<li><a href="event.html">Add Events</a></li>
-											
-                                            <li><a href="#">Dropdown</a>
-                                                <ul class="dropdown">
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                    <li><a href="#">Even Dropdown</a>
-                                                        <ul class="dropdown">
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                            <li><a href="#">Deeply Dropdown</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><a href="#">Even Dropdown</a></li>
-                                                </ul>
-                                            </li>
+                                        <li><a href="{{ route('Admin.index') }}">View Pending</a></li>
+											<li><a href="{{ route('Admin.showAll') }}">View All Accounts</a></li>    
                                         </ul>
                                     </li>
-                                    <li><a href="login.html">Login</a></li>
-                                    <li><a href="Register.html">Register</a></li>
+                                    @endif
+                                    @endauth
+									
+                                
+                                @auth
+                                <li><a href="{{ route('logout') }}">Hi, {{auth::user()->fname}}</a></li>
+                                @if(Session::has('edited'))
+                                        <li style="color:green">{{Session::get('edited')}}</li>
+                                @endif
+                                @else
+                                   <li><a href="{{ route('login') }}">Login</a></li>
+                                    <li><a href="{{ route('register') }}">Register</a></li>
+                                    @if(Session::has('successRegister'))
+                                        <li style="color:green">{{Session::get('successRegister')}}</li>
+                                    @endif
+                                @endauth
                                 </ul>
                            
                             </div>
@@ -132,7 +125,7 @@
             <!-- Single Hero Slide -->
             <div class="single-hero-slide d-flex align-items-center justify-content-center">
                 <!-- Slide Img -->
-                <div class="slide-img bg-img" style="background-image: url(img/bg-img/bg-1.jpg);"></div>
+                <div class="slide-img bg-img" style="background-image: url({{ asset('img/bg-img/bg-1.jpg') }});"></div>
                 <!-- Slide Content -->
                 <div class="container">
                     <div class="row">
@@ -149,7 +142,7 @@
             <!-- Single Hero Slide -->
             <div class="single-hero-slide d-flex align-items-center justify-content-center">
                 <!-- Slide Img -->
-                <div class="slide-img bg-img" style="background-image: url(img/bg-img/bg-2.jpg);"></div>
+                <div class="slide-img bg-img" style="background-image: url({{ asset('img/bg-img/bg-2.jpg') }});"></div>
                 <!-- Slide Content -->
                 <div class="container">
                     <div class="row">
@@ -166,7 +159,7 @@
     <!-- ##### Hero Area End ##### -->
 
     <!-- ##### Featured Artist Area Start ##### -->
-    <section class="featured-artist-area section-padding-100 bg-img bg-overlay bg-fixed" style="background-image: url(img/bg-img/bg-4.jpg);">
+    <section class="featured-artist-area section-padding-100 bg-img bg-overlay bg-fixed" style="background-image: url({{asset('img/bg-img/bg-4.jpg')}});">
         <div class="container">
             <div class="row align-items-end">
                 <div class="col-12 col-md-7 col-lg-8">
@@ -188,9 +181,9 @@
         <div class="container">
             <div class="row d-flex flex-wrap align-items-center">
                 <div class="col-12 col-md-6">
-                     <b>OPERA</b>
+                    <a href="#">Opera</a>
                     <p class="copywrite-text"><a href="#"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved By Opera.</a>
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved by Opera.</a>
 <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
                 </div>
             </div>
@@ -200,15 +193,15 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 
     <!-- ##### All Javascript Script ##### -->
     <!-- jQuery-2.2.4 js -->
-    <script src="js/jquery/jquery-2.2.4.min.js"></script>
+   <script src="{{ asset('js/jquery/jquery-2.2.4.min.js') }}"></script>
     <!-- Popper js -->
-    <script src="js/bootstrap/popper.min.js"></script>
+    <script src="{{ asset('js/bootstrap/popper.min.js') }}"></script>
     <!-- Bootstrap js -->
-    <script src="js/bootstrap/bootstrap.min.js"></script>
+    <script src="{{ asset('js/bootstrap/bootstrap.min.js') }}"></script>
     <!-- All Plugins js -->
-    <script src="js/plugins/plugins.js"></script>
+    <script src="{{ asset('js/plugins/plugins.js') }}"></script>
     <!-- Active js -->
-    <script src="js/active.js"></script>
+    <script src="{{ asset('js/active.js') }}"></script>
 </body>
 
 </html>

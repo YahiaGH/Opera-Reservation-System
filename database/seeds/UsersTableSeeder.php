@@ -16,17 +16,32 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+        // $user = new User();
+        // $user->username = 'Yahia_A1';
+        // $user->fname = 'Yahia';
+        // $user->lname = 'Mohamed';
+        // $user->password = Hash::make('12345');
+        // $user->email = 'Yahia.M.Yahia96@gmail.com';
+        // $user->city = 'Cairo';
+        // $user->Address = 'Maboutheen City After Tharwat Bridge';
+        // $user->gender = 'M';
+        // $user->Bdate = '1996-11-01';
+        // $user->privilage = 'admin';
+
+        // $user->save();
+
+
         $user = new User();
-        $user->username = 'Yahia_A1';
+        $user->username = 'Yahia_C11';
         $user->fname = 'Yahia';
         $user->lname = 'Mohamed';
         $user->password = Hash::make('12345');
-        $user->email = 'Yahia.M.Yahia96@gmail.com';
+        $user->email = 'C11@gmail.com';
         $user->city = 'Cairo';
         $user->Address = 'Maboutheen City After Tharwat Bridge';
         $user->gender = 'M';
         $user->Bdate = '1996-11-01';
-        $user->privilage = 'admin';
+        $user->privilage = 'customer';
 
         $user->save();
     }
